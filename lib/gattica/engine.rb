@@ -237,7 +237,7 @@ module Gattica
     # or manually by the user since the header must include the token)
     # If the option for GZIP is set also send this within the headers
     def set_http_headers
-      @headers['Authorization'] = "Bearer #{@token}"
+      @headers['Authorization'] = "GoogleLogin auth=#{@token}"
       if @options[:gzip]
         @headers['Accept-Encoding'] = 'gzip'
         @headers['User-Agent'] = 'Net::HTTP (gzip)'
