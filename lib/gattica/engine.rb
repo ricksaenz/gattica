@@ -9,6 +9,7 @@ module Gattica
     # == Options:
     # To change the defaults see link:settings.rb
     # +:debug+::        Send debug info to the logger (default is false)
+    # +:email+::        Your email/login for Google Analytics
     # +:headers+::      Add additional HTTP headers (default is {} )
     # +:logger+::       Logger to use (default is STDOUT)
     # +:profile_id+::   Use this Google Analytics profile_id (default is nil)
@@ -366,12 +367,17 @@ module Gattica
       @default_account_feed = nil
     end
 
-    # Use a token else, raise exception.
+    # If the authorization is a email and password then create User objects
+    # or if it's a previous token, use that.  Else, raise exception.
     def check_init_auth_requirements
-      if @options[:token].to_s.length > 1
+      if @options[:token].to_s.length > 200
         self.token = @options[:token]
+      elsif @options[:email] && @options[:password]
+        @user = User.new(@options[:email], @options[:password])
+        @auth = Auth.new(@http, user)
+        self.token = @auth.tokens[:auth]
       else
-        raise GatticaError::NoToken, 'An email and password or an authentication token is required to initialize Gattica.'
+        raise GatticaError::NoLoginOrToken, 'An email and password or an authentication token is required to initialize Gattica.'
       end
     end
 
